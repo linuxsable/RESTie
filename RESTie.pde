@@ -14,29 +14,32 @@ void setup() {
 }
 
 void loop() {
-  int clientId = 0;
-  int i = 0;
-  char output[255];
+  static int stat_clients = 0;
+  char clientLine[255];
   
   Client cli = server.available();
   if (cli) {
+    stat_clients++;
     
     // Get the HEADER string
+    int i = 0;
     while (cli.connected()) {
       if (cli.available()) {
         char c = cli.read();
         if (c != '\n' && c != '\r') {
-          output[i] = c;
+          clientLine[i] = c;
           i++;
         } else {
-          output[i] = '\0';
+          clientLine[i] = '\0';
           break;
         }
       }
     }
     
+    // First we pull the header method, URI
+    // and version.
     char *d = " ";
-    char *hMethod = strtok(output, d);
+    char *hMethod = strtok(clientLine, d);
     char *hURI;
     char *hVersion;
     if (NULL != hMethod) {
@@ -75,6 +78,11 @@ void loop() {
         printNoAction(cli);
       }
     }
+    else if (!strcmp("stats", controller)) {
+      char output[100];
+      sprintf(output, "Number of client connections: %d", stat_clients);
+      cli.println(output);
+    }
     else {
       printNoController(cli);
     }
@@ -101,7 +109,7 @@ void header(Client c, int co) {
 }
 
 void printNoAction(Client c) {
-  c.println("No action");
+  c.println("No action found");
 }
 
 void printNoController(Client c) {
