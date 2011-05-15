@@ -49,6 +49,8 @@ void loop() {
       }
     }
     
+    // Next we strip the controller, action,
+    // and value from the URI
     d = "/";
     char *r = NULL;
     char *temp = (char *)malloc(sizeof(char) * (strlen(hURI) + 1));
