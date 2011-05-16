@@ -14,12 +14,12 @@ void setup() {
 }
 
 void loop() {
-  static int stat_clients = 0;
   char clientLine[255];
-  
+  static int stat_hits = 0;
   Client cli = server.available();
+  
   if (cli) {
-    stat_clients++;
+    stat_hits++;
     
     // Get the HEADER string
     int i = 0;
@@ -67,55 +67,47 @@ void loop() {
       }
     }
     
+    // Send "everything OK" header
+    cli.println("HTTP/1.1 200 OK");
+    cli.println("Content-Type: application/json");
+    cli.println();
+    
+    String output = String();
+    output += "{\"status\":\"OK\",\"error\":false,\"result\":";
+    
     // START routes
     if (!strcmp("house", controller)) {
       // Define actions
       if (!strcmp("temp", action)) {
-        cli.println("House temperature is: 70f");
+        output += "\"70f\"";
       }
       else if (!strcmp("light", action)) {
-        cli.println("Light in house is: over 9000");
+        output += 1300;
       }
       else {
-        printNoAction(cli);
+        output += "\"\"";
       }
     }
     else if (!strcmp("stats", controller)) {
-      char output[100];
-      sprintf(output, "Number of client connections: %d", stat_clients);
-      cli.println(output);
+      output += "{\"status\":\"OK\",";
+      output += "\"uptime\":";
+      output += millis() / 1000;
+      output += ",\"hits\":";
+      output += stat_hits;
+      output += "}";
     }
+    // No route, set result to null
     else {
-      printNoController(cli);
+      output += "\"NULL\"";
     }
     // END routes
+    
+    output += "}";
+    cli.println(output);
     
     delay(1);
     cli.stop();
   }
-}
-
-void header(Client c, int co) {
-  switch (co) {
-    case 200:
-      c.println("HTTP/1.1 200 OK");
-    break;
-    
-    case 404:
-      c.println("HTTP/1.1 404 Not Found");
-    break;
-    
-    c.println("Content-Type: text/html");
-    c.println("");
-  }
-}
-
-void printNoAction(Client c) {
-  c.println("No action found");
-}
-
-void printNoController(Client c) {
-  c.println("No controller found");
 }
 
 void l(char *v) {
