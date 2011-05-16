@@ -85,7 +85,7 @@ void loop() {
         output += 1300;
       }
       else {
-        output += "\"\"";
+        outAppendNull(output);
       }
     }
     else if (!strcmp("stats", controller)) {
@@ -98,7 +98,7 @@ void loop() {
     }
     // No route, set result to null
     else {
-      output += "\"NULL\"";
+      outAppendNull(output);
     }
     // END routes
     
@@ -112,4 +112,8 @@ void loop() {
 
 void l(char *v) {
   Serial.println(v);
+}
+
+void outAppendNull(String &o) {
+  o += "\"NULL\"";
 }
