@@ -53,7 +53,12 @@ void loop() {
     // and value from the URI
     d = "/";
     char *r = NULL;
+    
     char *temp = (char *)malloc(sizeof(char) * (strlen(hURI) + 1));
+    if (NULL == temp) {
+      // Throw error here
+    }
+    
     strcpy(temp, hURI);
     char *controller;
     char *action;
@@ -104,6 +109,8 @@ void loop() {
     
     output += "}";
     cli.println(output);
+    
+    free(temp);
     
     delay(1);
     cli.stop();
