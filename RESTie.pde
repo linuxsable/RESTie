@@ -16,16 +16,16 @@ void setup() {
 void loop() {
   char clientLine[255];
   static int stat_hits = 0;
-  Client cli = server.available();
+  Client client = server.available();
   
-  if (cli) {
+  if (client) {
     stat_hits++;
     
     // Get the HEADER string
     int i = 0;
-    while (cli.connected()) {
-      if (cli.available()) {
-        char c = cli.read();
+    while (client.connected()) {
+      if (client.available()) {
+        char c = client.read();
         if (c != '\n' && c != '\r') {
           clientLine[i] = c;
           i++;
@@ -56,7 +56,7 @@ void loop() {
     
     char *temp = (char *)malloc(sizeof(char) * (strlen(hURI) + 1));
     if (NULL == temp) {
-      // Throw error here
+      return;
     }
     
     strcpy(temp, hURI);
@@ -73,9 +73,9 @@ void loop() {
     }
     
     // Send "everything OK" header
-    cli.println("HTTP/1.1 200 OK");
-    cli.println("Content-Type: application/json");
-    cli.println();
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: application/json");
+    client.println();
     
     String output = String();
     output += "{\"status\":\"OK\",\"error\":false,\"result\":";
@@ -108,17 +108,17 @@ void loop() {
     // END routes
     
     output += "}";
-    cli.println(output);
-    
-    free(temp);
+    client.println(output);
     
     delay(1);
-    cli.stop();
+    client.stop();
+    
+    free(temp);
   }
 }
 
-void l(char *v) {
-  Serial.println(v);
+void l(char *value) {
+  Serial.println(value);
 }
 
 void outAppendNull(String &o) {
